@@ -205,7 +205,10 @@ rpl::producer<ResaleGiftsDescriptor> ResaleGiftsSlice(
 			info.list.reserve(list.size());
 			for (const auto &entry : list) {
 				if (auto gift = Api::FromTL(session, entry)) {
-					info.list.push_back(std::move(*gift));
+					// Skip gifts that can only be sold for TON (not stars).
+					if (!gift->resellTonOnly) {
+						info.list.push_back(std::move(*gift));
+					}
 				}
 			}
 			info.attributesHash = data.vattributes_hash().value_or_empty();
