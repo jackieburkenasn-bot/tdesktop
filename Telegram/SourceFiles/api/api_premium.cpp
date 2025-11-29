@@ -663,7 +663,9 @@ auto PremiumGiftCodeOptions::requestStarGifts()
 				gifts.reserve(list.size());
 				for (const auto &gift : list) {
 					if (auto parsed = FromTL(session, gift)) {
-						gifts.push_back(std::move(*parsed));
+						if (!parsed->resellTonOnly) {
+							gifts.push_back(std::move(*parsed));
+						}
 					}
 				}
 				_gifts = std::move(gifts);
