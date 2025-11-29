@@ -701,6 +701,11 @@ void InnerWidget::loaded(const MTPpayments_SavedStarGifts &result) {
 	auto hasUnique = false;
 	for (const auto &gift : data.vgifts().v) {
 		if (auto parsed = Api::FromTL(_peer, gift)) {
+			// Skip gifts that can only be sold for TON (not stars).
+			const auto unique = parsed->info.unique.get();
+			if (unique && unique->onlyAcceptTon) {
+				continue;
+			}
 			if (collection && !collection->icon) {
 				collection->icon = parsed->info.document;
 				refreshCollectionsTabs();
@@ -711,7 +716,7 @@ void InnerWidget::loaded(const MTPpayments_SavedStarGifts &result) {
 				.gift = std::move(*parsed),
 				.descriptor = std::move(descriptor),
 			});
-			hasUnique = (parsed->info.unique != nullptr);
+			hasUnique = (unique != nullptr);
 		}
 	}
 	if (_entries->allLoaded) {
